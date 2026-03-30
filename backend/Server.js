@@ -1,17 +1,18 @@
 require("dotenv").config()
-const PORT = process.env.PORT || 5000
 const express = require("express")
 const connectDB = require("./config/conn")
-const userRoutes = require("./routes/userRoutes")
+const PORT = process.env.PORT
 
 const app = express()
 
+//Automatically connect to MongoDB on server start
 connectDB()
 
+//Middleware for parsing incoming data into JSON format
 app.use(express.json())
-app.use("/api/users", userRoutes)
 
+//Exposing backend route and connection status
 app.listen(PORT, () => {
-    console.log(`server is running on PORT ${PORT}`)
+    console.log(`Server is running on port: ${PORT}`)
 })
 
