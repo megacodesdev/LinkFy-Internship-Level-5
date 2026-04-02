@@ -67,6 +67,16 @@ exports.login = async (req, res) => {
     })
 
   }catch(err){
-
+    console.log("Error during login process: ", err)
+    return res.status(500).json({message: "We couldn't log you in, try after a moment"})
   }
 };
+
+exports.getCurrentUser =async (req, res) => {
+    try{
+        var user = await User.findById(req.user._id).select("-password")
+        return res.status(200).json({user})
+    } catch (err){
+        console.log("Failed to get user: ", err)
+    }
+}

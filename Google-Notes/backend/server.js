@@ -12,7 +12,7 @@ connectDB()
 //Middleware for parsing incoming data into JSON format
 app.use(express.json())
 
-app.use("/api/users", userRoutes)
+app.use("/api/users/auth`", userRoutes)
 
 app.listen(PORT, () => {
     console.log(`Server is running on PORT ${PORT}`)
