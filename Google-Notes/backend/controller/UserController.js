@@ -28,9 +28,11 @@ exports.registerUser = async (req, res) => {
       expiresIn: "7d",
     });
 
+    const savedUser = await User.findOne({email}).select("-password")
+
     res.status(201).json({
       data: {
-        user,
+        user: savedUser,
         token,
       },
       message: "User account has been created successfully!",
