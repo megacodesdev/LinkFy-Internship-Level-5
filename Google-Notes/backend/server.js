@@ -1,6 +1,7 @@
 require('dotenv').config()
 const express = require("express")
 const cors = require("cors")
+const morgan = require("morgan")
 const PORT = process.env.PORT
 const connectDB = require("./config/conn")
 const userRoutes = require("./routes/userRoutes")
@@ -18,6 +19,7 @@ app.use(cors({
 
 //Middleware for parsing incoming data into JSON format
 app.use(express.json())
+app.use(morgan("dev"))
 
 app.use("/api/users/auth", userRoutes)
 

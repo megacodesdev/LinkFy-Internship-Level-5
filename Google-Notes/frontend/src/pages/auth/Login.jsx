@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate, } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { useAuth } from '../../contexts/AuthContext';
 
-export default function Register(){
-    const { register } = useAuth()
+export default function Login(){
+    const { login } = useAuth()
     const [formData, setFormData] = useState({
-        fullnames: "",
         email: "",
         password: ""
     })
@@ -21,7 +20,7 @@ export default function Register(){
         setIsSubmitting(true)
 
         try {
-            const res = await register(formData)
+            const res = await login(formData)
             // if(!res.data){
             //     alert("Registration has failed")
             // }
@@ -42,8 +41,6 @@ export default function Register(){
                 <span className='text-center'>Quest Login</span>
             </div>
             <form className='flex flex-col items-center justify-center' onSubmit={handleSubmit}>
-                <label htmlFor="fullnames">Full Names</label>
-                <input type="text" name='fullnames' value={formData.fullnames} onChange={handleChange} placeholder='Enter your full names....' className=''/>
 
                 <label htmlFor="email">Email</label>
                 <input type="email" name="email" value={formData.email} onChange={handleChange}/>
@@ -53,7 +50,7 @@ export default function Register(){
 
                 <button>{isSubmitting ? "Creating account..." : "Create Account"}</button>
             </form>
-            <span>Already have account? <Link to="/login">Login here</Link> </span>
+            <span>No Account<Link to="/">Create Account</Link> </span>
         </div>
 
         </>
