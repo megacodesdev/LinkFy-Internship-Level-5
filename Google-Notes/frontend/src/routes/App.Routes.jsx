@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import Register from '../pages/auth/Register';
 import AuthProvider from '../contexts/AuthContext';
 import Login from '../pages/auth/Login';
+import Dashboard from '../pages/Dashbord';
 
 export default function AppRoutes(){
     return(
@@ -14,6 +15,7 @@ export default function AppRoutes(){
             <Routes>
                 <Route path='/' element={ <Register /> } />
                 <Route path='/login' element={ <Login /> } />
+                <Route path='/dashboard' element={ <Dashboard />} />
             </Routes>
          </Router>
          </AuthProvider>
