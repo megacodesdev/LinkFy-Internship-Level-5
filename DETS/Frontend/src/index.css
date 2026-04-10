@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+.app-logo {
+    background-color: rgb(4, 120, 228);
+    border-radius: 4px;
+    margin-bottom: 2rem;
+    position: relative;
+    right: 60px;
+  }
+  
+.app-logo::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 2px;
+    transform: translate(-50%, -50%);
+ }
+
+ .loadingcontainer{
+  animation: fade 0.5 linear infinite ease-in-out;
+ }
+
+ .loadingcontainer .loading{
+  animation: spin 0.5s forwards infinite ease-in-out;
+ }
+
+
+
+ 

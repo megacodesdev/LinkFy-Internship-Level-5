@@ -1,0 +1,411 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <?php
+
+$server = "localhost";
+$username = "root";
+$pwd = "";
+$db = "stock";
+
+$conn = mysqli_connect($server, $username, $pwd, $db);
+
+// Check connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+if (isset($_POST['submit'])) {
+    echo "Form submitted<br>";
+
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $cpassword = $_POST['c_password'];
+    $mail = $_POST['email'];
+
+    if ($password == $cpassword) {
+        
+
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $sql = "INSERT INTO `keeper` (`username`, `password`, `email`) VALUES ('$username', '$password', '$mail')";
+
+        $result = mysqli_query($conn, $sql);
+
+        if ($result) {
+            header("Location: index.php");
+        } else {
+            echo "Sign up failed: " . mysqli_error($conn);
+        }
+
+    } 
+}
+
+?>
+//Insert.php
+
+<?php
+$servername="localhost";
+$username="root";
+$password="";
+$database="admnistrator";
+
+$conn=new mysqli($servername,$username,$password,$database);
+$get=$_GET['id'];
+$sql="DELETE FROM `product list` WHERE `id`='$get'";
+$result=mysqli_query($conn,$sql);
+if($sql){
+    header("location:dash.php");
+}else{
+    echo"";
+}
+?>  *delete.php*
+
+<?php
+$host="localhost";
+$name="root";
+$password="";
+$database="mydatabase";
+
+$conn=new mysqli($host,$name,$password,$database);
+
+if(isset($_POST['login'])){
+    $name=$_POST['username'];
+    $password=$_POST['password'];
+    
+
+    $sql="SELECT * FROM `users` WHERE `username`='$name' AND `password`='$password'";
+    $result=mysqli_query($conn,$sql);
+    if($sql){
+        header("location:dash.php");
+    }
+    else{
+        echo"something went wrong";
+    }
+
+}
+
+?>
+
+*login.php*
+
+<?php
+$servername="localhost";
+$username="root";
+$password="";
+$database="admnistrator";
+
+$conn=new mysqli($servername,$username,$password,$database);
+
+$get=$_GET['id'];
+$sql="SELECT * FROM `product list` WHERE `id`='$get'";
+$result=mysqli_query($conn,$sql);
+
+
+
+
+?>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>update data</title>
+    <style>
+        .form{
+            width: 20%;
+            height: 50%;
+            background:grey;
+            padding:40px
+        }
+        input{
+            
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+            
+        }
+        body {
+      background: #f1f1f1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    
+    button {
+      padding: 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+     </style>   
+
+</head>
+<body>
+  
+    <div class="form">
+    <h3>add new product</h3>
+    <?php
+    while($row=mysqli_fetch_assoc($result)):
+    ?>
+    <form method="POST">
+    <input type="text" name="pname" value=" <?php echo $row['product name'];?>"><br><br>
+    <input type="text" name="category"  value=" <?php echo $row['category'];?>"><br><br>
+    <input type="text" name="price" value=" <?php echo $row['price'];?>"><br><br>
+    <input type="text"  name="quality"   value=" <?php echo $row['quality'];?>"><br><br>
+    <button type="submit" name="update" >update</button>
+    </form>
+    <?php
+    endwhile;
+    if(isset($_POST["update"])){
+      $name=$_POST["pname"];
+      $cate=$_POST["category"];
+      $pri=$_POST['price'];
+      $quali=$_POST['quality'];
+    
+
+    $sql= "UPDATE `product list` SET `id`='',`product name`='$name',`category`='$cate',`price`='$pri',`quality`='$quali' WHERE `id`=$get";
+    $result=mysqli_query($conn,$sql);
+    if($result){
+      header("location:dash.php");
+    }else{
+      echo "no updated";
+    }
+    }
+      
+
+    ?>
+</div>
+</body>
+</html>
+
+*update.php*
+
+<?php
+$servername="localhost";
+$username="root";
+$password="";
+$database="admnistrator";
+
+$conn=new mysqli($servername,$username,$password,$database);
+$sql="SELECT * FROM `product list`";
+$result=mysqli_query($conn,$sql);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product List</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 30px;
+      background-color: #f7f7f7;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .top-bar h2 {
+      margin: 0;
+    }
+
+    .add-btn {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      opacity: 1;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    td:last-child, td:nth-last-child(2) {
+      color: #007bff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none; 
+      position: fixed; 
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%; 
+      height: 100%;
+      overflow: auto; 
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .modal-content h3 {
+      margin-top: 0;
+    }
+
+    .modal-content input, .modal-content select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .modal-content button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: black;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <h2>Product List</h2>
+    <button class="add-btn" id="openModalBtn">+ Add New Product</button>
+  </div>
+
+  <table>
+  
+    <thead>
+  
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Price (RWF)</th>
+        <th>Quantity</th>
+        <th colspan="2">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+      <?php
+    while($high=mysqli_fetch_assoc($result)):
+    ?>
+        <td><?php echo $high['id'];?></td>
+        <td><?php echo $high['product name'];?></td>
+        <td><?php echo $high['category'];?></td>
+        <td><?php echo $high['price'];?></td>
+        <td><?php echo $high['quality'];?></td>
+        
+        <td><a href="delete.php?id=<?php echo $high['id'];?>">Delete</a></td>
+        <td><a href="update.php?id=<?php echo $high['id'];?>">update</a></td>
+   
+      </tr>
+    <?php
+    endwhile; 
+    ?>
+      
+     
+    </tbody>
+  </table>
+
+  <!-- Modal -->
+  <div id="addProductModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModalBtn">&times;</span>
+      <h3>Add New Product</h3>
+      <form method="POST" action="p.php">
+        <input type="text" name="name" placeholder="Product Name" required>
+        <input type="text" name="category" placeholder="Category" required>
+        <input type="number" name="price" placeholder="Price (RWF)" required>
+        <input type="number" name="quality" placeholder="Quantity" required>
+        <button type="submit" name="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('addProductModal');
+    const openBtn = document.getElementById('openModalBtn');
+    const closeBtn = document.getElementById('closeModalBtn');
+
+    openBtn.onclick = function() {
+      modal.style.display = "block";
+    }
+
+    closeBtn.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
+
+</body>
+</html>
+*dashbord.php*
+</body>
+</html>
