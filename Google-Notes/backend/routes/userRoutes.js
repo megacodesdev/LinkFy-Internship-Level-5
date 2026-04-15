@@ -9,5 +9,4 @@ const router = express.Router()
 router.post("/register", userController.registerUser)
 router.post("/login", userController.login)
 router.get("/get/me", verifyAuth, userController.getCurrentUser)
-
 module.exports = router

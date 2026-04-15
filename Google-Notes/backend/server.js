@@ -5,6 +5,7 @@ const morgan = require("morgan")
 const PORT = process.env.PORT
 const connectDB = require("./config/conn")
 const userRoutes = require("./routes/userRoutes")
+const NoteRoutes = require("./routes/NoteRoutes")
 
 const app = express()
 
@@ -22,6 +23,7 @@ app.use(express.json())
 app.use(morgan("dev"))
 
 app.use("/api/users/auth", userRoutes)
+app.use("/api/notes", NoteRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on PORT ${PORT}`)
