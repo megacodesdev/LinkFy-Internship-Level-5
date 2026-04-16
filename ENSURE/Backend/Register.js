@@ -20,9 +20,11 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(cookieParser());
 
+//Database connectivity
 const db = mysql.createConnection({
   user: "root",
   host: "localhost",
@@ -30,6 +32,7 @@ const db = mysql.createConnection({
   database: "store",
 });
 
+//Testing database connectivity
 db.connect((err) => {
   if (err) {
     console.log("MySQL Serve refused to connect.");
@@ -134,7 +137,7 @@ db.query(activities, (err) => {
 });
 
 //JWT Secret key
-const SECRET_KEY = process.env.SECRET_KEY;
+const SECRET_KEY = process.env.SECRET_KEY || "kasndkjafiooaksdjoiasfmjksdfnsdjf";
 
 //Function to generate token for system users
 function generateToken(user) {
@@ -470,6 +473,56 @@ app.get("/api/products/stock-out", async (req, res) => {
     `
   );
   res.status(200).json(products);
+});
+
+//Displaying each product with stockin quantity
+app.get("/api/products/:id/amount", async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        p.productId,
+        p.productName,
+        p.productCode,
+        s.stockInQuantity,
+        s.stockInUnitPrice,
+        s.stockInTotal,
+        s.stockInDate
+      FROM products p
+      LEFT JOIN stockin s 
+      ON p.productId = s.productId
+    `;
+
+    const [result] = await db.promise().query(query);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("LEFT JOIN error:", error);
+    res.status(500).json({ message: "Error fetching LEFT JOIN data" });
+  }
+});
+
+//Showing all stockouts even though product details might be missing
+app.get("/api/stockout/:id", async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        p.productId,
+        p.productName,
+        p.productCode,
+        s.stockOutQuantity,
+        s.stockOutUnitPrice,
+        s.stockOutTotal,
+        s.stockOutDate
+      FROM products p
+      RIGHT JOIN stockout s
+      ON p.productId = s.productId
+    `;
+
+    const [result] = await db.promise().query(query);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("RIGHT JOIN error:", error);
+    res.status(500).json({ message: "Error fetching RIGHT JOIN data" });
+  }
 });
 
 // Backend API (Node.js/Express)
