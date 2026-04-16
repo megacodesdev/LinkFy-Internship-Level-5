@@ -1,26 +1,31 @@
-import React, { useEffect, useState } from "react";
+ import React, { useEffect, useState } from "react";
 
 export default function Dashboard() {
   const [notes, setNotes] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [message, setMessage] = useState("");
   const [editingId, setEditingId] = useState(null);
+  const [message, setMessage] = useState("");
 
-  // LOAD FROM LOCAL STORAGE
+  const API = "http://localhost:5000/api/notes";
+
+  // ✅ FETCH NOTES FROM DATABASE
   useEffect(() => {
-    const storedNotes = JSON.parse(localStorage.getItem("notes")) || [];
-    setNotes(storedNotes);
+    fetchNotes();
   }, []);
 
-  // SAVE TO LOCAL STORAGE
-  const saveNotes = (updatedNotes) => {
-    setNotes(updatedNotes);
-    localStorage.setItem("notes", JSON.stringify(updatedNotes));
+  const fetchNotes = async () => {
+    try {
+      const res = await fetch(API);
+      const data = await res.json();
+      setNotes(data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  // CREATE OR UPDATE NOTE
-  const handleCreate = (e) => {
+  // ✅ CREATE OR UPDATE NOTE
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!title || !content) {
@@ -28,114 +33,138 @@ export default function Dashboard() {
       return;
     }
 
-    if (editingId) {
-      // UPDATE
-      const updatedNotes = notes.map((note) =>
-        note.id === editingId
-          ? { ...note, title, content }
-          : note
-      );
+    try {
+      if (editingId) {
+        // 🔁 UPDATE
+        const res = await fetch(`${API}/${editingId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ title, content }),
+        });
 
-      saveNotes(updatedNotes);
-      setMessage("Note updated successfully!");
-      setEditingId(null);
+        const updatedNote = await res.json();
 
-    } else {
-      // CREATE
-      const newNote = {
-        id: Date.now(),
-        title,
-        content,
-      };
+        setNotes(notes.map((n) => (n._id === editingId ? updatedNote : n)));
+        setEditingId(null);
+        setMessage("Note updated ✅");
+      } else {
+        // ➕ CREATE
+        const res = await fetch(API, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ title, content }),
+        });
 
-      const updatedNotes = [newNote, ...notes];
-      saveNotes(updatedNotes);
-      setMessage("Note created successfully!");
+        const newNote = await res.json();
+        setNotes([newNote, ...notes]);
+        setMessage("Note created ✅");
+      }
+
+      setTitle("");
+      setContent("");
+    } catch (err) {
+      console.error(err);
+      setMessage("Something went wrong ❌");
     }
-
-    setTitle("");
-    setContent("");
   };
 
-  // DELETE NOTE
-  const handleDelete = (id) => {
-    const updatedNotes = notes.filter((note) => note.id !== id);
-    saveNotes(updatedNotes);
-    setMessage("Note deleted!");
+  // ✅ DELETE NOTE
+  const handleDelete = async (id) => {
+    try {
+      await fetch(`${API}/${id}`, {
+        method: "DELETE",
+      });
+
+      setNotes(notes.filter((n) => n._id !== id));
+      setMessage("Note deleted 🗑️");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  // EDIT NOTE
+  // ✅ SET EDIT MODE
   const handleEdit = (note) => {
     setTitle(note.title);
     setContent(note.content);
-    setEditingId(note.id);
-    setMessage("Editing note...");
+    setEditingId(note._id);
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
+      <div className="max-w-4xl mx-auto">
 
-      <h1 className="text-2xl font-bold mb-4">Dashboard - Notes</h1>
+        {/* TITLE */}
+        <h1 className="text-3xl font-bold mb-6 text-center">
+          📒 Notes Dashboard
+        </h1>
 
-      {/* FORM */}
-      <form onSubmit={handleCreate} className="bg-white p-4 rounded shadow mb-6">
-
-        <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full mb-2 p-2 border rounded"
-        />
-
-        <textarea
-          placeholder="Content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="w-full mb-2 p-2 border rounded"
-        />
-
-        <button className="bg-blue-600 text-white px-4 py-2 rounded">
-          {editingId ? "Update Note" : "Create Note"}
-        </button>
-
+        {/* MESSAGE */}
         {message && (
-          <p className="mt-2 text-green-600 font-semibold">{message}</p>
-        )}
-      </form>
-
-      {/* NOTES LIST */}
-      <div className="grid gap-4">
-        {notes.length === 0 && (
-          <p className="text-gray-500">No notes yet...</p>
+          <p className="text-center text-green-600 mb-4">{message}</p>
         )}
 
-        {notes.map((note) => (
-          <div key={note.id} className="bg-white p-4 rounded shadow">
+        {/* FORM */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-4 rounded-xl shadow mb-6"
+        >
+          <input
+            type="text"
+            placeholder="Title"
+            className="w-full p-2 border rounded mb-3"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
 
-            <h2 className="font-bold text-lg">{note.title}</h2>
-            <p className="text-gray-600 mb-3">{note.content}</p>
+          <textarea
+            placeholder="Content"
+            className="w-full p-2 border rounded mb-3"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
 
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleEdit(note)}
-                className="bg-yellow-500 text-white px-3 py-1 rounded"
-              >
-                Edit
-              </button>
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            {editingId ? "Update Note" : "Add Note"}
+          </button>
+        </form>
 
-              <button
-                onClick={() => handleDelete(note.id)}
-                className="bg-red-600 text-white px-3 py-1 rounded"
-              >
-                Delete
-              </button>
+        {/* NOTES LIST */}
+        <div className="grid md:grid-cols-2 gap-4">
+          {notes.map((note) => (
+            <div
+              key={note._id}
+              className="bg-white p-4 rounded-xl shadow"
+            >
+              <h2 className="font-bold text-lg">{note.title}</h2>
+              <p className="text-gray-600 mb-3">{note.content}</p>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleEdit(note)}
+                  className="bg-yellow-400 px-3 py-1 rounded"
+                >
+                  Edit
+                </button>
+
+                <button
+                  onClick={() => handleDelete(note._id)}
+                  className="bg-red-500 text-white px-3 py-1 rounded"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
+          ))}
+        </div>
 
-          </div>
-        ))}
       </div>
-
     </div>
   );
 }
